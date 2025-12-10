@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add User</title>
+    <link rel="stylesheet" href="{% static 'css/adduser.css' %}">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="header-nav">
+            <h1 style="color: white; font-size: 28px;">👥 User Management</h1>
+            <button class="nav-btn" onclick="viewchats()">📱 View Chats</button>
+        </div>
+
+        <!-- Add User Form -->
+        <div class="form-section">
+            <h2>➕ Add New User</h2>
+
+            <!-- Error Message -->
+            {% if error %}
+                <div class="error-message show">{{ error }}</div>
+            {% endif %}
+
+            <!-- Success Message -->
+            {% if success %}
+                <div class="success-message">✓ User added successfully!</div>
+            {% endif %}
+
+            <form action="{% url 'adduser' %}" method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username"
+                        name="newusername" 
+                        placeholder="Enter a username" 
+                        maxlength="100"
+                        required
+                        autofocus
+                    >
+                </div>
+
+                <div class="form-group">
+                    <button type="submit">➕ Add User</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- All Users Section -->
+        <div class="users-section">
+            <h2>👥 All Users ({{ total_users }})</h2>
+
+            {% if users %}
+                <div class="users-list">
+                    {% for user in users %}
+                        <div class="user-card">
+                            <div class="user-avatar">{{ user.username|first|upper }}</div>
+                            <h3>{{ user.username }}</h3>
+                            <p>ID: #{{ user.id }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                <a href="{% url 'completechats' %}" class="view-chats-btn">💬 View All Chats</a>
+            {% else %}
+                <div class="empty-state">
+                    <p>📭 No users added yet. Add your first user above!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        function viewchats()
+        {
+            window.location.href="{% url 'chats' %}";
+        }
+    </script>
+</body>
+</html>

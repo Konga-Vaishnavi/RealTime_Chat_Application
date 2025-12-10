@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIN PAGE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ADD8E6 0%, #87CEEB 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content: "💬 💬 💬 💬 💬";
+            position: absolute;
+            font-size: 120px;
+            opacity: 0.08;
+            top: -50px;
+            left: -50px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        body::after {
+            content: "💬 💬 💬 💬 💬";
+            position: absolute;
+            font-size: 120px;
+            opacity: 0.08;
+            bottom: -50px;
+            right: -50px;
+            animation: float 6s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(20px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .chat-icon {
+            width: 80px;
+            height: 80px;
+            background: #4A90E2;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            font-size: 40px;
+            color: white;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #4A90E2;
+        }
+
+        .input-wrapper::before {
+            margin-right: 10px;
+            font-size: 18px;
+            color: #999;
+        }
+
+        .input-wrapper.username::before {
+            content: "👤";
+        }
+
+        .input-wrapper.password::before {
+            content: "🔒";
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+        }
+
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #999;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-signin {
+            background: #4A90E2;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-signin:hover {
+            background: #357ABD;
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-cancel {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .btn-cancel:hover {
+            background: #E0E0E0;
+        }
+
+        .footer {
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .footer a {
+            color: #4A90E2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-password a {
+            font-size: 13px;
+            color: #4A90E2;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+
+            h2 {
+                font-size: 24px;
+                margin-bottom: 25px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-signin {
+                flex: 1;
+            }
+
+            body::before,
+            body::after {
+                font-size: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-icon">💬</div>
+        <div class="login-card">
+            <h2>Login</h2>
+            <form method="post" id="loginForm" >
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Email</label>
+                    <div class="input-wrapper username">
+                        <input type="email" id="username" name="username" placeholder="Enter your username" required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper password">
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="reset" class="btn-cancel">Cancel</button>
+                    <button type="submit" class="btn-signin" > Sign in</button>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="#">Forgot your password?</a>
+                </div>
+
+                <div class="footer">
+                    <p>Not registered? <a href="{% url 'registerpage' %}">Create an account</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('loginForm');
+            if (!form) return;
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                window.location.href = "{% url 'profile' %}";
+            });
+         });
+        
+     
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    
+    <link rel="stylesheet" href="{% static 'css/chats.css' %}">
+</head>
+<body >
+    <div class="chat-container">
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <!-- Chat Header -->
+            
+            <header class="chat-header">
+                
+                <div class="chat-header-info">
+                    <h3 id="chat-username">{% if username %}{{ username }}{% else %}Select a chat{% endif %}</h3>
+                    <p id="chat-activity">{% if timestamp %}{{ timestamp }}{% else %}offline{% endif %}</p>
+                </div>
+                <div class="chat-header-actions">
+                    <a href="{% url 'completechats' %}" style="text-decoration: none;">
+                        <button class="header-btn" title="Back">⬅️</button>
+                    </a>
+                    <button class="header-btn" title="Call">☎️</button>
+                    <button class="header-btn" title="Video Call">📹</button>
+                    <button class="header-btn" title="Info">ℹ️</button>
+                </div>
+            </header>
+           <div class="message-container">
+            <!-- Messages Container -->
+            <div class="messages-container">
+                {% if user_chats %}
+                    {% for chat in user_chats %}
+                    <div class="message own">
+                        <div>
+                            <div class="message-content">{{ chat.content }}</div>
+                            <div class="message-time">{{ chat.timestamp|date:"g:i A" }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                
+                    <div class="message">
+                        <div>
+                            <div class="message-content">No messages yet. Start a conversation!</div>
+                            <div class="message-time">--</div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+           
+        
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-wrapper" name="inputwrapper">
+                   <input type="text" id="message-input" class="message-input" name="content" placeholder="Type a message..." maxlength="1000">
+                </div>
+                <button class="send-btn" name="send" onclick="sendMessage()">📤</button>
+            </div>
+             
+           </div> 
+        
+        </main>
+    </div>
+
+    <script>
+        window.userId = {% if user_id %}{{ user_id }}{% else %}null{% endif %};
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Immediately show message in UI
+            const messagesContainer = document.querySelector('.messages-container');
+            
+            // Clear default message
+            const defaultMsg = messagesContainer.querySelector('.message:not(.own)');
+            if (defaultMsg && defaultMsg.textContent.includes('No messages yet')) {
+                defaultMsg.remove();
+            }
+            
+            // Add message to UI immediately
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message own';
+            messageDiv.innerHTML = `
+                <div>
+                    <div class="message-content">${message}</div>
+                    <div class="message-time">now</div>
+                </div>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            input.value = '';
+            
+            // Save to server in background
+            if (window.userId) {
+                fetch('{% url 'save-message' %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: new URLSearchParams({
+                        user_id: window.userId,
+                        content: message
+                    })
+                }).catch(error => console.error('Save error:', error));
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('message-input');
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+
+
+
+
+</body>
+
+</html>
